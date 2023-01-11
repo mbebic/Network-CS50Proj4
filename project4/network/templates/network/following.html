@@ -1,0 +1,71 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col">
+                    <h2 class="text-center mt-2">Posts from your Followers</h2>
+                    {% for post in posts %}
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <a href="{% url 'profile' post.author.id %}">
+                                            <h6 class="card-title">{{ post.author }}</h6>
+                                        </a>
+                                        <small class="align-self-center text-muted text-right">posted at {{ post.timestamp }}</small>
+                                        {% if user.is_authenticated and user == post.author %}
+                                        <a href="javascript:void(0)" data-id="{{ post.id }}" id="editpost_{{ post.id }}" class="badge badge-secondary">Edit Post</a>
+                                        {% endif %}
+                                        <div id="postcontentgroup_{{ post.id }}"></div>
+                                        <p id="postcontent_{{ post.id }}"class="card-text mt-2">{{ post.content }}</p>
+                                        <div id="post_likes_{{ post.id }}">
+                                            {% if user.is_authenticated %}
+                                            <i id="heartbtn_{{ post.id }}" data-id="{{ post.id }}" class="fa fa-heart-o {% if user in post.liked_by.all %}fa fa-heart{% else %}fa fa-heart-o{% endif %}"></i>
+                                            {% else %}
+                                            <i class="fa fa-heart-o {% if post.likes != 0 %}fa fa-heart{% else %}fa fa-heart-o{% endif %}"></i>
+                                            {% endif %}
+                                            <span id="postlikecount_{{ post.id }}">{{ post.likes }}</span>
+                                        </div>
+                                        <div class="text-right" id="savecancelbtns_{{ post.id }}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        No posts.
+                    {% endfor %}
+                    <div class="row mt-2 align-self-center">
+                        <div class="col text-center">
+                            {% if pg_obj.object_list %}
+                            <nav aria-label="...">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item {% if not pg_obj.has_previous %} disabled {% endif %}">
+                                        <a class="page-link" href="{{ pg_url }}">Previous</a>
+                                    </li>
+                                    {% for n in pg_obj.paginator.page_range %}
+                                        {% if n in pg_obj.number %}
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">
+                                                    {{ n }}
+                                                <span class="sr-only">(current)</span>
+                                                </span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <li class="page-item {% if not pg_obj.has_next %} disabled {% endif %}">
+                                        <a class="page-link" href="{{ pg_url }}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

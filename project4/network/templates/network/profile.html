@@ -1,0 +1,88 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col text-center">
+                                    <h2 id="userprofile">{{ username }}</h2>
+                                    <h4 class="text-muted" id="fwlrcount">{{ followed_by }} Followers</h4>
+                                    <h4 class="text-muted" id="flwingcount">{{ following }} Following</h4>
+                                    <h5 class="text-muted">Last login on: {{ lastlogin }}</h5>
+                                    {% if user.is_authenticated %}
+                                        <!-- <i id="folunfolbutton_{{ username.id }}" data-id="{{ username.id }}">Follow</i> -->
+                                        <button id="folunfolbutton_{{ username.id }}" data-id="{{ username.id }}" type="button" class="btn btn-primary">Follow</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <!-- <h4 class="text-center mt-2">Your posts</h4> -->
+                    {% for post in posts %}
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h6 class="card-title">{{ post.author }}</h6>
+                                        <small class="align-self-center text-muted text-right">posted at {{ post.timestamp }}</small>
+                                        <p class="card-text mt-2">{{ post.content }}</p>
+                                        <div id="post_likes_{{ post.id }}">
+                                            {% if user.is_authenticated %}
+                                            <i id="hearticon_{{ post.id }}" data-id="{{ post.id }}" class="fa fa-heart-o {% if user in post.liked_by.all %}fa fa-heart{% else %}fa fa-heart-o{% endif %}"></i>
+                                            {% else %}
+                                            <i class="fa fa-heart-o {% if post.likes != 0 %}fa fa-heart{% else %}fa fa-heart-o{% endif %}"></i>
+                                            {% endif %}
+                                            <span id="post_likecount_{{ post.id }}">{{ post.likes }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        No posts.
+                    {% endfor %}
+                    <div class="row mt-2 align-self-center">
+                        <div class="col text-center">
+                            {% if pg_obj.object_list %}
+                            <nav aria-label="...">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item {% if not pg_obj.has_previous %} disabled {% endif %}">
+                                        <a class="page-link" href="{{ pg_url }}">Previous</a>
+                                    </li>
+                                    {% for n in pg_obj.paginator.page_range %}
+                                        {% if n in pg_obj.number %}
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">
+                                                    {{ n }}
+                                                <span class="sr-only">(current)</span>
+                                                </span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <li class="page-item {% if not pg_obj.has_next %} disabled {% endif %}">
+                                        <a class="page-link" href="{{ pg_url }}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'network/profilepage.js' %}"></script>
+{% endblock %}
